@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "izeesoft.layer-atlas",
+  "name": "Layer Atlas",
+  "version": "0.1.0",
+  "author": "Adam Moussa Ali",
+  "license": "MIT",
+  "description": "Live Wayland layer-shell surface, namespace, geometry, and focus inspector.",
+  "kinds": [
+    "service",
+    "bar-widget",
+    "panel"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "service": "Service.qml",
+    "barWidget": "BarWidget.qml",
+    "panel": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "Layer Atlas",
+    "description": "Inspect the hidden layer-shell geometry that shapes the desktop around every window.",
+    "category": "Developer Tools",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}
