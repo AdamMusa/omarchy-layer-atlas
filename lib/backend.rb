@@ -105,10 +105,13 @@ class SuiteBackend
       levels.each do |level, surfaces|
         Array(surfaces).first(64).each do |surface|
           namespace = clean(surface["namespace"] || surface["address"] || "unnamed", 100)
+          own_surface = namespace == "izeesoft.layer-atlas"
+          title = own_surface ? "Layer Atlas panel" : namespace
           geometry = "#{surface["w"] || "?"}×#{surface["h"] || "?"} @ #{surface["x"] || "?"},#{surface["y"] || "?"}"
           detail = "#{monitor} · #{geometry}"
           meta = "PID #{surface["pid"] || "?"} · alpha #{surface["alpha"] || "?"}"
-          rows << item(namespace, detail, "layer #{level}", meta)
+          meta = "#{meta} · this inspector" if own_surface
+          rows << item(title, detail, "layer #{level}", meta)
         end
       end
     end
@@ -161,6 +164,7 @@ class SuiteBackend
   rescue SystemCallError
     nil
   end
+
 
   def relative_files(root)
     return [] unless File.directory?(root)

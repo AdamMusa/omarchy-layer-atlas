@@ -110,10 +110,13 @@ class SuiteBackend
       levels.each do |level, surfaces|
         Array(surfaces).first(64).each do |surface|
           namespace = clean(surface["namespace"] || surface["address"] || "unnamed", 100)
+          own_surface = namespace == "izeesoft.layer-atlas"
+          title = own_surface ? "Layer Atlas panel" : namespace
           geometry = "#{surface["w"] || "?"}×#{surface["h"] || "?"} @ #{surface["x"] || "?"},#{surface["y"] || "?"}"
           detail = "#{monitor} · #{geometry}"
           meta = "PID #{surface["pid"] || "?"} · alpha #{surface["alpha"] || "?"}"
-          rows << item(namespace, detail, "layer #{level}", meta)
+          meta = "#{meta} · this inspector" if own_surface
+          rows << item(title, detail, "layer #{level}", meta)
         end
       end
     end
@@ -166,6 +169,7 @@ class SuiteBackend
   rescue SystemCallError
     nil
   end
+
 
   def relative_files(root)
     return [] unless File.directory?(root)
@@ -289,6 +293,8 @@ OmarchyUI.plugin do
   state :primary, ""
   state :secondary, ""
   state :compose, false
+  state :page, 0
+  state :selected_plugin, ""
 
   refresh = proc do
     state.snapshot = backend.refresh
@@ -300,10 +306,10 @@ OmarchyUI.plugin do
     value = status.to_s.downcase
     danger = false
     healthy = false
-    %w[broken critical missing mismatch drift inactive slow tight hotspot invalid].each do |token|
+    %w[broken critical missing mismatch drift inactive slow tight risk invalid attention].each do |token|
       danger = true if value.include?(token)
     end
-    %w[ready valid verified finished aligned unique internal familiar steady covered available detected normal].each do |token|
+    %w[ready valid verified finished aligned unique internal familiar steady covered available detected normal active loaded].each do |token|
       healthy = true if value.include?(token)
     end
     if danger
@@ -319,10 +325,10 @@ OmarchyUI.plugin do
     value = status.to_s.downcase
     danger = false
     healthy = false
-    %w[broken critical missing mismatch drift inactive slow tight hotspot invalid].each do |token|
+    %w[broken critical missing mismatch drift inactive slow tight risk invalid attention].each do |token|
       danger = true if value.include?(token)
     end
-    %w[ready valid verified finished aligned unique internal familiar steady covered available detected normal].each do |token|
+    %w[ready valid verified finished aligned unique internal familiar steady covered available detected normal active loaded].each do |token|
       healthy = true if value.include?(token)
     end
     if danger
@@ -378,18 +384,24 @@ OmarchyUI.plugin do
             text "Visible compositor strata, from overlays down to the desktop background.", style: :caption
             levels.each_with_index do |level, level_index|
               surfaces = entries.select { |entry| entry.fetch("status", "") == level }
-              rectangle width: 590, height: [68, 32 + surfaces.length * 25].max, radius: 4, border_width: 1,
+              visible_surfaces = surfaces.first(5)
+              rectangle width: 590, height: [68, 34 + visible_surfaces.length * 39].max, radius: 4, border_width: 1,
                 border_color: level_index.zero? ? "#55efc4" : "#44505a", padding: 9 do
                 column spacing: 5 do
                   row spacing: 8 do
                     text labels[level_index], style: :caption, color: level_index.zero? ? "#55efc4" : "#9ca8b2", width: 110
                     text "#{surfaces.length} surfaces", style: :caption
                   end
-                  surfaces.first(5).each do |entry|
+                  visible_surfaces.each do |entry|
                     row spacing: 8 do
                       icon :eye, size: 12, color: "#55efc4"
-                      text entry.fetch("title"), width: 245
-                      text entry.fetch("detail", ""), style: :caption, width: 285
+                      column spacing: 1 do
+                        row spacing: 8 do
+                          text entry.fetch("title"), width: 235
+                          text entry.fetch("detail", ""), style: :caption, width: 280
+                        end
+                        text entry.fetch("meta", ""), style: :caption, color: "#9ca8b2", width: 520
+                      end
                     end
                   end
                 end
@@ -400,5 +412,5 @@ OmarchyUI.plugin do
   end
 
   after(0.08, &refresh)
-  every(10, &refresh)
+  every(2, &refresh)
 end
