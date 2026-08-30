@@ -5,7 +5,7 @@
 
 **Inspect the hidden layer-shell geometry that shapes the desktop around every window.**
 
-Layer Atlas parses Hyprland's live layer tree and exposes monitor, layer level, namespace, geometry, exclusive zone, and keyboard-interactivity facts.
+Layer Atlas parses Hyprland's live layer tree and exposes each surface's monitor, layer level, namespace, geometry, process identity, and alpha.
 
 ![Layer Atlas preview](preview.png)
 

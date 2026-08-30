@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "author": "Adam Moussa Ali",
   "license": "MIT",
-  "description": "Live Wayland layer-shell surface, namespace, geometry, and focus inspector.",
+  "description": "Live Wayland layer-shell namespace, geometry, layer, and process inspector.",
   "kinds": [
     "service",
     "bar-widget",

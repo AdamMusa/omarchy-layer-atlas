@@ -110,9 +110,9 @@ class SuiteBackend
       levels.each do |level, surfaces|
         Array(surfaces).first(64).each do |surface|
           namespace = clean(surface["namespace"] || surface["address"] || "unnamed", 100)
-          geometry = Array(surface["geometry"]).join(" × ")
-          detail = "monitor #{monitor} · level #{level} · geometry #{geometry}"
-          meta = "exclusive #{surface["exclusiveZone"] || "?"} · keyboard #{surface["keyboardInteractivity"] || "?"}"
+          geometry = "#{surface["w"] || "?"}×#{surface["h"] || "?"} @ #{surface["x"] || "?"},#{surface["y"] || "?"}"
+          detail = "#{monitor} · #{geometry}"
+          meta = "PID #{surface["pid"] || "?"} · alpha #{surface["alpha"] || "?"}"
           rows << item(namespace, detail, "layer #{level}", meta)
         end
       end
