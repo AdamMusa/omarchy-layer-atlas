@@ -318,6 +318,18 @@ OmarchyUI.plugin do
     end
   end
 
+  first_number = lambda do |value|
+    number = 0
+    value.to_s.split.each do |token|
+      candidate = token.to_i
+      if candidate > 0
+        number = candidate
+        break
+      end
+    end
+    number
+  end
+
   bar_widget do
     row spacing: 7 do
       icon :eye, color: "#55efc4"
