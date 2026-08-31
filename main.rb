@@ -353,60 +353,80 @@ OmarchyUI.plugin do
   end
 
   bar_widget do
-    row spacing: 7 do
-      icon :eye, color: "#55efc4"
-      text { state.snapshot.fetch("summary") }
+    row spacing: 6 do
+      icon :eye, size: 14, color: "#55efc4"
+      text "ATLAS", style: :caption, color: "#55efc4"
+      text(style: :caption) { state.snapshot.fetch("summary") }
     end
     on_click { open_panel :layer_atlas }
   end
 
   panel :layer_atlas do
-    scroll width: 660, height: 760 do
+    scroll width: 660, height: 780 do
       dynamic id: :scene, spacing: 16 do
         entries = state.snapshot.fetch("items")
-        history = state.snapshot.fetch("history")
+        levels = ["layer 3", "layer 2", "layer 1", "layer 0"]
+        labels = ["OVERLAY", "TOP", "BOTTOM", "BACKGROUND"]
+        colors = ["#ff8b8b", "#7dcfff", "#d8ff73", "#55efc4"]
 
-        row spacing: 12 do
-          icon :eye, size: 30, color: "#55efc4"
-          column spacing: 2 do
-            text "Layer Atlas", style: :heading, width: 500
-            text state.snapshot.fetch("summary"), style: :caption, width: 500
-          end
-          action_button :refresh, tooltip: "Refresh", foreground: "#55efc4" do
-            async(&refresh)
+        column spacing: 2 do
+          text "#{entries.length} surfaces mapped across the live compositor", style: :caption, width: 610
+          row spacing: 9 do
+            text "Layer", size: 30, bold: true
+            icon :eye, size: 22, color: "#55efc4"
+            text "Atlas", size: 30, bold: true, width: 465
+            action_button :refresh, tooltip: "Remap layers", foreground: "#55efc4" do
+              async(&refresh)
+            end
           end
         end
 
         separator
-        levels = ["layer 3", "layer 2", "layer 1", "layer 0"]
-            labels = ["OVERLAY", "TOP", "BOTTOM", "BACKGROUND"]
-            text "#{entries.length} layer-shell surfaces", size: 34, bold: true, color: "#55efc4"
-            text "Visible compositor strata, from overlays down to the desktop background.", style: :caption
-            levels.each_with_index do |level, level_index|
-              surfaces = entries.select { |entry| entry.fetch("status", "") == level }
-              visible_surfaces = surfaces.first(5)
-              rectangle width: 590, height: [68, 34 + visible_surfaces.length * 39].max, radius: 4, border_width: 1,
-                border_color: level_index.zero? ? "#55efc4" : "#44505a", padding: 9 do
-                column spacing: 5 do
-                  row spacing: 8 do
-                    text labels[level_index], style: :caption, color: level_index.zero? ? "#55efc4" : "#9ca8b2", width: 110
-                    text "#{surfaces.length} surfaces", style: :caption
-                  end
-                  visible_surfaces.each do |entry|
-                    row spacing: 8 do
-                      icon :eye, size: 12, color: "#55efc4"
-                      column spacing: 1 do
-                        row spacing: 8 do
-                          text entry.fetch("title"), width: 235
-                          text entry.fetch("detail", ""), style: :caption, width: 280
-                        end
-                        text entry.fetch("meta", ""), style: :caption, color: "#9ca8b2", width: 520
-                      end
-                    end
-                  end
-                end
+        text "COMPOSITOR STRATA", size: 12, bold: true, color: "#55efc4"
+        levels.each_with_index do |level, level_index|
+          surfaces = entries.select { |entry| entry.fetch("status", "") == level }
+          indent = 72 - level_index * 24
+          band_width = 445 + level_index * 48
+          row spacing: 0 do
+            text "", width: indent
+            rectangle width: band_width, height: 44, radius: 3,
+                      color: "#101b18", border_width: 1, border_color: colors[level_index], padding: 9 do
+              row spacing: 8 do
+                text "0#{3 - level_index}", style: :caption, color: colors[level_index], width: 28
+                text labels[level_index], size: 13, bold: true, color: colors[level_index], width: 270
+                text surfaces.length.to_s.rjust(2, "0"), size: 18, bold: true, color: colors[level_index]
+                text "SURFACES", style: :caption
               end
             end
+          end
+          text "#{" " * (9 - level_index * 3)}╲#{"━" * (44 + level_index * 6)}",
+               style: :caption, color: colors[level_index]
+        end
+
+        separator
+        row spacing: 10 do
+          text "SURFACE COORDINATES", size: 12, bold: true, color: "#55efc4", width: 450
+          text "LIVE · 2 SEC", style: :caption, color: "#829088"
+        end
+
+        entries.first(14).each_with_index do |entry, index|
+          level_index = levels.index(entry.fetch("status", "")) || 3
+          layer_color = colors[level_index]
+          row spacing: 10 do
+            rectangle width: 4, height: 48, radius: 2, color: layer_color
+            text (index + 1).to_s.rjust(2, "0"), style: :caption, color: layer_color, width: 24
+            column spacing: 1 do
+              text entry.fetch("title"), width: 360, size: 15, bold: true, wrap: true
+              text entry.fetch("detail", ""), style: :caption, width: 360, wrap: true
+              text entry.fetch("meta", ""), style: :caption, width: 360, color: "#829088", wrap: true
+            end
+            column spacing: 1 do
+              text labels[level_index], style: :caption, color: layer_color, width: 110
+              text "L#{3 - level_index}", size: 20, bold: true, color: layer_color
+            end
+          end
+          separator unless index == [entries.length, 14].min - 1
+        end
       end
     end
   end
