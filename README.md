@@ -9,6 +9,13 @@ Layer Atlas parses Hyprland's live layer tree and exposes each surface's monitor
 
 ![Layer Atlas preview](preview.png)
 
+## Built entirely in Ruby
+
+All application behavior, system integration, and UI declarations are authored in
+Ruby. There is no handwritten QML source. Omarchy UI compiles the Ruby-declared UI
+into `OmarchyUI/Bundles/` and emits the three tiny root QML loader shims required by
+the plugin manifest; those shims are generated packaging output.
+
 ## Why this is distinct
 
 Window switchers inspect normal application windows. Layer Atlas is specifically for layer-shell surfaces such as bars, launchers, wallpapers, overlays, and locks.
@@ -61,11 +68,6 @@ rm -r ~/.local/state/omarchy-layer-atlas
 - Tags: hyprland, quickshell, system
 - Kinds: service, bar widget, panel
 - Target: Omarchy Quattro on x86-64 Linux
-
-## Verification
-
-Executable provenance, retained build sources, checksums, and byte-for-byte reproduction
-instructions are grouped in [`audit/`](audit/README.md).
 
 ## License
 
