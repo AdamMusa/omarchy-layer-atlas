@@ -1,4 +1,4 @@
 import QtQuick
-import "OmarchyUI/Bundles/B3068ce0ae985ee2b3a8f" as Compiled
+import "OmarchyUI/Bundles/Bbff0e9f0ebd16b30e9bf" as Compiled
 
 Compiled.Service {}
